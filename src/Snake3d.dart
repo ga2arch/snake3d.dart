@@ -31,6 +31,8 @@ Food food;
 num currentTime, lastTime;
 bool gameover = false;
 
+// Fragment Shader 
+// doc: http://en.wikipedia.org/wiki/Shader#Pixel_shaders 
 String fragmentS = """
     precision mediump float;
 
@@ -39,7 +41,9 @@ String fragmentS = """
     void main(void) {
         gl_FragColor = vColor;
     }""";
-    
+
+// Vertex Shader
+// doc: http://en.wikipedia.org/wiki/Shader#Vertex_shaders
 String vertexS = """
     attribute vec3 aVertexPosition;
     attribute vec4 aVertexColor;
