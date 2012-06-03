@@ -1,6 +1,5 @@
 class Cube {
 
-  WebGLRenderingContext gl;
   List<num> vertices;
   List<num> colors;
   List<num> indices;
@@ -11,7 +10,7 @@ class Cube {
       vertexColorBuffer,
       vertexIndexBuffer;
   
-  Cube(this.gl, this.vertices, this.colors, this.indices) {
+  Cube(this.vertices, this.colors, this.indices) {
     initBuffers();
   }
   
@@ -33,7 +32,7 @@ class Cube {
       WebGLRenderingContext.STATIC_DRAW);
   }
   
-  void _binds(Shaders shaders) {
+  void _binds() {
     gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexPositionBuffer);
     gl.vertexAttribPointer(shaders.vertexPositionAttribute, 3, 
       WebGLRenderingContext.FLOAT, false, 0, 0);
@@ -45,16 +44,14 @@ class Cube {
     gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, vertexIndexBuffer);
   }
   
-  void draw(mvMatrix, pMatrix, shaders) {
-    _binds(shaders);
+  void draw() {
+    _binds();
+    
+    mvPushMatrix();
     gl.uniform3f(shaders.positionUniform, x, y, z);
     
-    setMatrixUniforms(shaders, pMatrix, mvMatrix);
+    setMatrixUniforms();
     gl.drawElements(WebGLRenderingContext.TRIANGLE_STRIP, 36, WebGLRenderingContext.UNSIGNED_SHORT, 0);
-  }
-
-  void setMatrixUniforms(Shaders shaders, pMatrix, mvMatrix) {
-    gl.uniformMatrix4fv(shaders.pMatrixUniform, false, pMatrix.buf);
-    gl.uniformMatrix4fv(shaders.mvMatrixUniform, false, mvMatrix.buf);
+    mvPopMatrix();
   }
 }

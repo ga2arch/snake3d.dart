@@ -17,9 +17,9 @@ class Snake {
   
   void spawnBody() {
     for (int i=0; i < 2; i++) {
-      var cube = GeometryFactory.createCube(gl, 4, [0.0, 1.0, 0.0, 1.0]);
-      cube.x = 13-i*4;
-      cube.y = 9;
+      var cube = GeometryFactory.createCube(4, [0.0, 1.0, 0.0, 1.0]);
+      cube.x = 14-i*4;
+      cube.y = 10;
       cube.z = 2;
       body.add(cube);
     }
@@ -43,15 +43,15 @@ class Snake {
     if (Input.isKeyPressed(Keys.SPACE))
       snake.eat();
     
-    if (currentTime > 0.8) {
+    if (currentTime > 0.2) {
       move();
       currentTime = 0;
     }
   }
   
-  void draw(mvMatrix, pMatrix, shaders) {
+  void draw() {
     body.forEach((c) {
-      c.draw(mvMatrix, pMatrix, shaders);
+      c.draw();
     });
   }
   
@@ -73,7 +73,7 @@ class Snake {
   }
   
   void eat() {
-    var cube = GeometryFactory.createCube(gl, 4, [0.0, 1.0, 0.0, 1.0]);
+    var cube = GeometryFactory.createCube(4, [0.0, 1.0, 0.0, 1.0]);
     cube.x = body.last().x;
     cube.y = body.last().y;
     cube.z = 2;

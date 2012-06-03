@@ -1,6 +1,6 @@
 class GeometryFactory {
   
-  static Cube createCube(WebGLRenderingContext gl, num size, List color) {
+  static Cube createCube(num size, List color) {
     var vertices = [
                 // Front face
                 -1.0, -1.0,  1.0,
@@ -53,15 +53,15 @@ class GeometryFactory {
                              20, 21, 22,   20, 22, 23  // Left face
                          ];
     
-    Cube cube = new Cube(gl, vertices, colors, indices);
+    Cube cube = new Cube(vertices, colors, indices);
     return cube;
   }
   
-  static Grid createGrid(gl, num width, num height, num size) {
+  static Grid createGrid(num width, num heigth, num size) {
     var vertices = [];
     for (int x=0; x <= width; x+=size) {
       vertices.addAll([x, 0.0, 0.0]);
-      vertices.addAll([x, height, 0.0]);
+      vertices.addAll([x, heigth, 0.0]);
       
       vertices.addAll([0.0, x, 0.0]);
       vertices.addAll([width, x, 0.0]);
@@ -72,7 +72,7 @@ class GeometryFactory {
      colors.addAll([0.658824, 0.658824, 0.658824, 1.0]);
     }
     
-    return new Grid(gl, width, height, size, vertices, colors);
+    return new Grid(width, heigth, size, vertices, colors);
   }
   
 }

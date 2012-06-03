@@ -11,7 +11,10 @@
 #source('Input.dart');
 #source('Keys.dart');
 
+#source('Food.dart');
 #source('Snake.dart');
+
+#source('Random.dart');
 
 
 WebGLRenderingContext gl;
@@ -61,6 +64,7 @@ String vertexS = """
 
 void initGL() {
   try {
+    canvas = document.query('#canvas');
     gl = canvas.getContext('experimental-webgl');
   } catch(Exception e) {
     
@@ -88,8 +92,16 @@ void drawScene() {
   mvMatrix = Matrix4.translation(new Vector3(-60.0, -30.0, -120.0));
   mvMatrix *= Matrix4.rotation(-45.0, new Vector3(1.0, 0.0, 0.0));
   
-  grid.draw(mvMatrix, pMatrix, shaders);
-  snake.draw(mvMatrix, pMatrix, shaders);
+  grid.draw();
+  snake.draw();
+  food.draw();
+  
+}
+
+
+void setMatrixUniforms() {
+  gl.uniformMatrix4fv(shaders.pMatrixUniform, false, pMatrix.buf);
+  gl.uniformMatrix4fv(shaders.mvMatrixUniform, false, mvMatrix.buf);
 }
 
 var currentTime;
@@ -100,7 +112,6 @@ void animate() {
       var elapsed = (timeNow - lastTime) / 1000;
       snake.act(elapsed);
 
-      
   }
   lastTime = timeNow;
 }
@@ -109,8 +120,8 @@ void tick() {
   if (gameover) return;
   window.webkitRequestAnimationFrame((_) => tick());
   animate();
-  //checkCollision();
   drawScene();
+  checkCollision();
 }
 
 void main() {
@@ -121,20 +132,12 @@ void main() {
   lastTime = 0;
   currentTime = 0;
   
-  canvas = document.query('#canvas');
   initGL();
   initShaders();
-  //initBuffers();
-  
-  grid = GeometryFactory.createGrid(gl, 120, 120, 4);
-  grid.x = -1;
-  grid.y = -1;
-  grid.z = 0;
-  
-  snake = new Snake();
-  food = [0, 0];
-  //spawnFood();
-  
+  initGrid();
+  initSnake();
+  initFood();
+
   var input = new Input();
   
   gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -143,43 +146,45 @@ void main() {
   tick();
 }
 
+void initGrid() {
+  grid = GeometryFactory.createGrid(120, 120, 4);
+  grid.x = 0;
+  grid.y = 0;
+  grid.z = 0;
+}
+
+void initSnake() {
+  snake = new Snake();
+}
+
+void initFood() {
+  food = new Food();
+  food.spawnFood();
+}
+
 void checkCollision() {
   // check borders
   var snakeHead = snake.body.first();
-  if (snakeHead[0] < 1 || snakeHead[0] > WIDTH-1 || snakeHead[1] < 1 || snakeHead[1] > HEIGHT -1 ) {
+  if (snakeHead.x < 2 || snakeHead.x > grid.width-2 || 
+      snakeHead.y < 2 || snakeHead.y > grid.heigth-2)
     gameOver();
-  }
   
   //check food
-  if (snakeHead[0] == food[0] && snakeHead[1] == food[1]) {
-    snake.eaten();
-    spawnFood();
+  if (snakeHead.x == food.cube.x && 
+      snakeHead.y == food.cube.y) {
+    snake.eat();
+    food.spawnFood();
   }
   
   //check itself
   int headCount = 0;
   snake.body.forEach((cube) {
-    if (snakeHead[0] == cube[0] && snakeHead[1] == cube[1]) headCount++;
+    if (snakeHead.x == cube.x && 
+        snakeHead.y == cube.y) 
+      headCount++;
   });
   if (headCount > 1) gameOver();
   
-}
-
-void spawnFood() {
-  int time = new Date.now().value;
-  
-  var x = (time % (WIDTH/2)).floor() * 2 + 1;
-  var y = (time % (HEIGHT/2)).floor() * 2 + 1;
-  
-  food[0] = x;
-  food[1] = y;
-  
-  print(x);
-  print(y);
-  
-  snake.body.forEach((cube) {
-    if (cube[0] == food[0] && cube[1] == food[1]) spawnFood();
-  });
 }
 
 void gameOver() {
@@ -187,7 +192,3 @@ void gameOver() {
   window.alert('Gameover');
   gameover = true;
 }
-
-
-
-

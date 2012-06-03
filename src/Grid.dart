@@ -1,9 +1,8 @@
 class Grid {
   
-  num width, height, size;
+  num width, heigth, size;
   num x, y, z;
   
-  WebGLRenderingContext gl;
   List<num> vertices;
   List<num> colors;
   List<num> indices;
@@ -12,7 +11,7 @@ class Grid {
       vertexColorBuffer,
       vertexIndexBuffer;
   
-  Grid(this.gl, this.width, this.height, this.size, this.vertices, this.colors) {
+  Grid(this.width, this.heigth, this.size, this.vertices, this.colors) {
     initBuffers();
   }
   
@@ -28,7 +27,7 @@ class Grid {
       WebGLRenderingContext.STATIC_DRAW);
   }
   
-  void _binds(Shaders shaders) {
+  void _binds() {
     gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexPositionBuffer);
     gl.vertexAttribPointer(shaders.vertexPositionAttribute, 3, 
       WebGLRenderingContext.FLOAT, false, 0, 0);
@@ -38,19 +37,15 @@ class Grid {
       WebGLRenderingContext.FLOAT, false, 0, 0);
   }
   
-  void draw(mvMatrix, pMatrix, shaders) {
-    _binds(shaders);
-
+  void draw() {
+    _binds();
+    
+    mvPushMatrix();
     gl.uniform3f(shaders.positionUniform, x, y, z);
     //mvMatrix *= Matrix4.rotation(rot, new Vector3(0.0, 0.0, 1.0));
     
-    setMatrixUniforms(shaders, mvMatrix, pMatrix);
+    setMatrixUniforms();
     gl.drawArrays(WebGLRenderingContext.LINES, 0, (vertices.length/3).toInt());
+    mvPopMatrix();
   }
-  
-  void setMatrixUniforms(Shaders shaders, mvMatrix, pMatrix) {
-    gl.uniformMatrix4fv(shaders.pMatrixUniform, false, pMatrix.buf);
-    gl.uniformMatrix4fv(shaders.mvMatrixUniform, false, mvMatrix.buf);
-  }
-  
 }
