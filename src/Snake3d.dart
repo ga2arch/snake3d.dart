@@ -104,8 +104,8 @@ void tick() {
   if (gameover) return;
   window.webkitRequestAnimationFrame((_) => tick());
   animate();
-  drawScene();
   checkCollision();
+  drawScene();
 }
 
 void animate() {
@@ -118,6 +118,8 @@ void animate() {
 }
 
 void drawScene() {
+  if (gameover) return;
+  
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
 
@@ -153,7 +155,6 @@ void checkCollision() {
       headCount++;
   });
   if (headCount > 1) gameOver();
-  
 }
 
 void setMatrixUniforms() {
@@ -168,15 +169,6 @@ void mvPushMatrix() {
 void mvPopMatrix() {
   mvMatrix = mvMatrixStack.removeLast();
 }
-
-
-
-
-
-
-
-
-
 
 void gameOver() {
   print('Gameover${snake.body}');
