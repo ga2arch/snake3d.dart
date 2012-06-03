@@ -1,80 +1,83 @@
 class Snake {
   
-  static num UP = 1,
+  static num UP    = 1,
              RIGHT = 2,
-             LEFT = 3,
-             DOWN = 4;
+             LEFT  = 3,
+             DOWN  = 4;
   
-  var currentTime;
+  num currentTime, direction;
   Queue body;
-  var direction;
-  bool gotdir;
   
   Snake() {
-    //head = {'x':10, 'y':10};
     currentTime = 0;
     direction = RIGHT;
-    gotdir = false;
-    body = new Queue.from([[11, 9], [9, 9]]);
+    body = new Queue();
+    spawnBody();
+  }
+  
+  void spawnBody() {
+    for (int i=0; i < 2; i++) {
+      var cube = GeometryFactory.createCube(gl, 4, [0.0, 1.0, 0.0, 1.0]);
+      cube.x = 13-i*4;
+      cube.y = 9;
+      cube.z = 2;
+      body.add(cube);
+    }
   }
   
   void act(num delta) {
     currentTime += delta;
+    
+    if (Input.isKeyPressed(Keys.LEFT))
+      snake.direction = Snake.LEFT;
+    
+    if (Input.isKeyPressed(Keys.RIGHT))
+      snake.direction = Snake.RIGHT;
+    
+    if (Input.isKeyPressed(Keys.UP))
+      snake.direction = Snake.UP;
+    
+    if (Input.isKeyPressed(Keys.DOWN))
+      snake.direction = Snake.DOWN;
+    
+    if (Input.isKeyPressed(Keys.SPACE))
+      snake.eat();
+    
     if (currentTime > 0.8) {
       move();
       currentTime = 0;
-      gotdir = false;
     }
   }
   
-  void move() {
-   var x = body.first()[0]; 
-   var y = body.first()[1];
-      
-   if (direction == UP) {
-     y += 2;
-   } 
-   if (direction == RIGHT) {
-     x += 2;
-   }
-   if (direction == LEFT) {
-     x -= 2;
-   }
-   if (direction == DOWN) {
-     y -= 2;
-   }
-     
-   body.addFirst([x, y]);
-   body.removeLast();
-  }
-  
-  void eaten() {
-    body.addLast(body.last());
-  }
-  
-  void reverse() {
-    Queue temp = new Queue.from(snake.body);
-    body.clear();
-    temp.forEach((cube) => body.addFirst(cube));
-    var head = body.first();
-    var second;
-    int i = 0;
-    body.forEach((cube) {
-      if (i == 1) 
-        second = cube; 
-      else 
-        i++;
+  void draw(mvMatrix, pMatrix, shaders) {
+    body.forEach((c) {
+      c.draw(mvMatrix, pMatrix, shaders);
     });
-    
-    if (head[0] < second[0])
-      direction = LEFT;
-    if (head[0] > second[0])
-      direction = RIGHT;
-    if (head[1] < second[1])
-      direction = DOWN;
-    if (head[1] > second[1])
-      direction = UP;
-    
   }
   
+  void move() {
+   num x = body.first().x; 
+   num y = body.first().y;
+      
+   switch (direction) {
+     case UP:    y += 4; break;
+     case RIGHT: x += 4; break;
+     case LEFT:  x -= 4; break;
+     case DOWN:  y -= 4; break;
+   }
+      
+   var ncube = body.removeLast();
+   ncube.x = x;
+   ncube.y = y;
+   body.addFirst(ncube);
+  }
+  
+  void eat() {
+    var cube = GeometryFactory.createCube(gl, 4, [0.0, 1.0, 0.0, 1.0]);
+    cube.x = body.last().x;
+    cube.y = body.last().y;
+    cube.z = 2;
+    
+    body.addLast(cube);
+  }
 }

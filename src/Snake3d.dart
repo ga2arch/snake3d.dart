@@ -21,7 +21,7 @@ Matrix4 pMatrix;
 CanvasElement canvas;
 Shaders shaders;
 
-var grid, cube;
+var grid;
 
 var mvMatrixStack;
 var rCube;
@@ -88,21 +88,8 @@ void drawScene() {
   mvMatrix = Matrix4.translation(new Vector3(-60.0, -30.0, -120.0));
   mvMatrix *= Matrix4.rotation(-45.0, new Vector3(1.0, 0.0, 0.0));
   
-  mvPushMatrix();
   grid.draw(mvMatrix, pMatrix, shaders);
-  mvPopMatrix();
-  
-  mvPushMatrix();
-  cube.draw(mvMatrix, pMatrix, shaders);
-  mvPopMatrix();
-
-}
-
-void drawSnake() {
-  snake.body.forEach((cube) {
-    //drawCube(cube[0], cube[1], 1);
-  });
-  print(snake.body);
+  snake.draw(mvMatrix, pMatrix, shaders);
 }
 
 var currentTime;
@@ -113,33 +100,7 @@ void animate() {
       var elapsed = (timeNow - lastTime) / 1000;
       snake.act(elapsed);
 
-      if (!snake.gotdir) {
-      if (Input.isKeyPressed(Keys.LEFT)) {
-        if (snake.direction == Snake.RIGHT) {
-          snake.reverse();
-        } else 
-          snake.direction = Snake.LEFT;
-      }
-      if (Input.isKeyPressed(Keys.RIGHT))
-        if (snake.direction == Snake.LEFT) {
-          snake.reverse();
-        } else 
-          snake.direction = Snake.RIGHT;
-      if (Input.isKeyPressed(Keys.UP))
-        if (snake.direction == Snake.DOWN) {
-          snake.reverse();
-        } else 
-          snake.direction = Snake.UP;
-      if (Input.isKeyPressed(Keys.DOWN))
-        if (snake.direction == Snake.UP) {
-          snake.reverse();
-        } else 
-          snake.direction = Snake.DOWN;
-      if (Input.isKeyPressed(Keys.SPACE)) {
-        snake.eaten();
-        }
-      snake.gotdir = true;
-      } 
+      
   }
   lastTime = timeNow;
 }
@@ -148,15 +109,15 @@ void tick() {
   if (gameover) return;
   window.webkitRequestAnimationFrame((_) => tick());
   animate();
-  checkCollision();
+  //checkCollision();
   drawScene();
 }
 
 void main() {
   mvMatrix = Matrix4.identity();
-  pMatrix =  Matrix4.identity();
+  pMatrix  = Matrix4.identity();
   mvMatrixStack = [];
-  rCube = 0;
+  
   lastTime = 0;
   currentTime = 0;
   
@@ -166,44 +127,21 @@ void main() {
   //initBuffers();
   
   grid = GeometryFactory.createGrid(gl, 120, 120, 4);
-  grid.x = 0;
-  grid.y = 0;
+  grid.x = -1;
+  grid.y = -1;
   grid.z = 0;
-  
-  cube = GeometryFactory.createCube(gl, 5, [0.0, 1.0, 0.0, 1.0]);
-  cube.x = 10;
-  cube.y = 10;
-  cube.z = 0;
   
   snake = new Snake();
   food = [0, 0];
-  spawnFood();
+  //spawnFood();
   
   var input = new Input();
   
   gl.clearColor(1.0, 1.0, 1.0, 1.0);
   gl.enable(WebGLRenderingContext.DEPTH_TEST);
   
-  //document.on.keyDown.add(onKeyDown);
-  
   tick();
 }
-
-void onKeyDown(evt) {
-  /*evt.preventDefault();
-  if (evt.keyCode == 37)
-    snake.direction = Snake.LEFT;
-  if (evt.keyCode == 39)
-    snake.direction = Snake.RIGHT;
-  if (evt.keyCode == 38)
-    snake.direction = Snake.UP;
-  if (evt.keyCode == 40)
-    snake.direction = Snake.DOWN;
-  if (evt.keyCode == Keys.SPACE) 
-    snake.eaten();*/
-}
-
-
 
 void checkCollision() {
   // check borders
