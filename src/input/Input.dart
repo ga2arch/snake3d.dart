@@ -9,14 +9,7 @@ class Input {
     onKeyDown();
     onKeyUp();
   }
-  
-  static Input getInstance() {
-    if (_instance == null) {
-      _instance = new Input();
-    }
-    return _instance;
-  }
-  
+
   void onKeyDown() {
     document.on.keyDown.add((evt) {
       evt.preventDefault();
@@ -32,14 +25,7 @@ class Input {
   }
   
   static bool isKeyPressed(num keyCode) {
-    var status;
-    if (_pressed.containsKey(keyCode)) status = _pressed[keyCode];
-    else status = false;
-    takeOf(keyCode);
-    return status;
-  }
-  
-  static void takeOf(num keyCode) {
-    if (_pressed.containsKey(keyCode)) _pressed[keyCode] = false;
+    if (_pressed.containsKey(keyCode)) return _pressed[keyCode];
+    else return false;
   }
 }
